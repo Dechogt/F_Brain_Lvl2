@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  client:
+    build: ./client
+  server:
+    build: ./server
+    depends_on:
+      - rabbitmq
+  rabbitmq:
+    image: rabbitmq:3-management
+  celery-exporter:
+    image: danihodovic/celery-exporter
+    environment:
+      - CELERY_BROKER_URL=amqp://rabbitmq:5672
+  prometheus:
+    build: ./monitoring
+    ports: ["9090:9090"]
+  grafana:
+    build: ./monitoring
+    ports: ["3000:3000"]
+  proxy:
+    image: nginx:alpine
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+    ports: ["80:80"]
